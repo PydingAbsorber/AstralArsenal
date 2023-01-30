@@ -1,0 +1,63 @@
+{
+  "type": "astralsorcery:altar",
+  "altar_type": 3,
+  "duration": 1000,
+  "starlight": 100,
+  "pattern": [
+    "__B__",
+    "__A__",
+    "BACAB",
+    "__A__",
+    "__B__"
+  ],
+  "key": {
+    "A": {
+      "tag": "forge:feathers"
+    },
+    "B": {
+      "tag": "astralsorcery:stardust"
+    },
+    "C": {
+      "tag": "astralsorcery:infused_crystal_sword"
+    }
+  },
+  "recipe_class": "astralasrenal:star_edge",
+  "output": [
+    {
+      "item": "astralarsenal:star_edge",
+      "count": 1
+    }
+  ],
+  "options": {
+    "copy_nbt_from_items_matching": [
+      {
+        "item": "astralarsenal:star_edge"
+      }
+    ],
+    "constellation": "astralsorcery:armara"
+  },
+  "focus_constellation": "astralsorcery:vicio",
+  "relay_inputs": [
+    {
+      "tag": "astralsorcery:stardust"
+    },
+    {
+      "tag": "astralsorcery:stardust"
+    },
+    {
+      "tag": "astralsorcery:stardust"
+    },
+    {
+      "tag": "astralsorcery:stardust"
+    }
+  ],
+  "effects": [
+    "astralsorcery:built_in_effect_constellation_finish",
+    "astralsorcery:built_in_effect_trait_relay_highlight",
+    "astralsorcery:built_in_effect_discovery_central_beam",
+    "astralsorcery:built_in_effect_trait_focus_circle",
+    "astralsorcery:altar_default_sparkle",
+    "astralsorcery:built_in_effect_constellation_lines",
+    "astralsorcery:built_in_effect_attunement_sparkle"
+  ]
+}
