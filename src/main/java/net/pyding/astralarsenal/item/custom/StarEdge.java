@@ -31,6 +31,7 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.NonNullList;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.LogicalSide;
@@ -41,7 +42,7 @@ import java.util.Properties;
 
 import static hellfirepvp.astralsorcery.common.constellation.mantle.effect.MantleEffectAevitas.CONFIG;
 
-public class StarEdge extends Item implements CrystalAttributeItem, TypeEnchantableItem, ConstellationItem {
+public class StarEdge extends Item implements CrystalAttributeItem, TypeEnchantableItem, ConstellationBaseItem {
 
     public StarEdge(Properties properties) {
         super(properties);
@@ -90,81 +91,71 @@ public class StarEdge extends Item implements CrystalAttributeItem, TypeEnchanta
 
     @Nullable
     @Override
-    public IWeakConstellation getAttunedConstellation(ItemStack itemStack) {
-        return (IWeakConstellation) IConstellation.readFromNBT(NBTHelper.getPersistentData(itemStack));
+    public IConstellation getConstellation(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return IConstellation.readFromNBT(NBTHelper.getPersistentData(stack), IConstellation.getDefaultSaveKey());
     }
 
     @Override
-    public boolean setAttunedConstellation(ItemStack stack, @Nullable IWeakConstellation cst) {
-        if (cst != null) {
-            cst.writeToNBT(NBTHelper.getPersistentData(stack));
-        } else {
+    public boolean setConstellation(ItemStack stack, @Nullable IConstellation cst) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+        if (cst == null) {
             NBTHelper.getPersistentData(stack).remove(IConstellation.getDefaultSaveKey());
-        }
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public IMinorConstellation getTraitConstellation(ItemStack stack) {
-        return (IMinorConstellation) IConstellation.readFromNBT(NBTHelper.getPersistentData(stack), "constellationTrait");
-    }
-
-    @Override
-    public boolean setTraitConstellation(ItemStack stack, @Nullable IMinorConstellation cst) {
-        if (cst != null) {
-            cst.writeToNBT(NBTHelper.getPersistentData(stack), "constellationTrait");
         } else {
-            NBTHelper.getPersistentData(stack).remove("constellationTrait");
+            cst.writeToNBT(NBTHelper.getPersistentData(stack), IConstellation.getDefaultSaveKey());
         }
         return true;
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+        PlayerEntity player = (PlayerEntity) entityIn;
+        if (isSelected == true)
+        {
+            String[] constallations = new String[16];
+            constallations[0] = "Aevitas";
+            constallations[1] = "Evorsio";
+            constallations[2] = "Vicio";
+            constallations[3] = "Decidia";
+            constallations[4] = "Armara";
+            constallations[5] = "Horologium";
+            constallations[6] = "Lucerna";
+            constallations[7] = "Mineralis";
+            constallations[8] = "Octans";
+            constallations[9] = "Bootes";
+            constallations[10] = "Fornax";
+            constallations[11] = "Pelotrio";
+            constallations[12] = "Gelu";
+            constallations[13] = "Ulteria";
+            constallations[14] = "Alcara";
+            constallations[15] = "Vorux";
+            IConstellation cst = this.getConstellation(stack);
+            if(cst != null) {
+                for (int i = 0; i < 15; i++) {
+                    if (cst.getConstellationName().equals(constallations[i]))
+                        stack.getOrCreateTag().putDouble(constallations[i], 1);
+                    else
+                        stack.getOrCreateTag().putDouble(constallations[i], 0);
+                }
+            }
+        }
     }
     @Override
     public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         PlayerEntity player = (PlayerEntity) attacker;
-        IConstellation constellation = getAttunedConstellation(stack);
-        if(constellation.getConstellationName().equals("Aevitas"))
-        {
-            stack.getOrCreateTag().putDouble("aevitasstacktime", 100);
-            Double victim = stack.getOrCreateTag().getDouble("victim");
-            Double victim2 = stack.getOrCreateTag().getDouble("victim2");
-            stack.getOrCreateTag().putDouble("victim1", target.getUniqueID().getMostSignificantBits());
-            if(victim2 == null)
-                stack.getOrCreateTag().putDouble("victim2", victim);
-            if(victim2 == victim) {
-                if(target.getPersistentData().getDouble("aevitasstack") < 20)
-                player.getPersistentData().putDouble("aevitasstack", target.getPersistentData().getDouble("aevitasstack") + 1);
-            } else
-            {
-                player.getPersistentData().putDouble("aevitasstack", 0);
-            }
-
-
-
-        }
-        if(constellation.getConstellationName().equals("Evorsio"))
-            stack.getOrCreateTag().putDouble("evorsio",1);
-        else
-            stack.getOrCreateTag().putDouble("evorsio",0);
-        if(target instanceof PlayerEntity && constellation.getConstellationName().equals("Vicio")) {
+        IConstellation cst = this.getConstellation(stack);
+        if(target instanceof PlayerEntity && cst.getConstellationName().equals("Lucerna")) {
             PlayerEntity entity = (PlayerEntity) target;
             AlignmentChargeHandler.INSTANCE.drainCharge(entity, LogicalSide.SERVER, 100, false);
         }
-        if(constellation.getConstellationName().equals("Gelu"))
-            stack.getOrCreateTag().putDouble("gelu" , 1);
-        else
-            stack.getOrCreateTag().putDouble("gelu" , 0);
-        if(constellation.getConstellationName().equals("Armara"))
-            stack.getOrCreateTag().putDouble("armara" , 1);
-            else
-            stack.getOrCreateTag().putDouble("armara" , 0);
-        if(constellation.getConstellationName().equals("Decidia")) {
-            stack.getOrCreateTag().putDouble("decidia" , 1);
-            //target.attackEntityFrom(new DamageSource("astral").setDamageIsAbsolute().setDamageBypassesArmor(),6+EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS, stack));
-        } else
-            stack.getOrCreateTag().putDouble("decidia" , 0);
-        if(constellation.getConstellationName().equals("Armara"))
-            player.addPotionEffect(new EffectInstance(Effects.ABSORPTION, 200, 3));
+
+
         return super.hitEntity(stack, target, attacker);
     }
+
+
 }

@@ -12,7 +12,7 @@
   ],
   "key": {
     "A": {
-      "tag": "forge:feathers"
+      "tag": "astralsorcery:stardust"
     },
     "B": {
       "tag": "astralsorcery:stardust"
@@ -21,22 +21,12 @@
       "tag": "astralsorcery:infused_crystal_sword"
     }
   },
-  "recipe_class": "astralasrenal:star_edge",
   "output": [
     {
       "item": "astralarsenal:star_edge",
       "count": 1
     }
   ],
-  "options": {
-    "copy_nbt_from_items_matching": [
-      {
-        "item": "astralarsenal:star_edge"
-      }
-    ],
-    "constellation": "astralsorcery:armara"
-  },
-  "focus_constellation": "astralsorcery:vicio",
   "relay_inputs": [
     {
       "tag": "astralsorcery:stardust"

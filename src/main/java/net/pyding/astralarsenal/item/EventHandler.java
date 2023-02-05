@@ -4,8 +4,12 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.AbsorptionEffect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -39,27 +43,43 @@ public class EventHandler {
                 Entity entity = event.getEntity();
                 Entity sourceentity = event.getSource().getTrueSource();
                 Entity livingEntity = event.getEntityLiving();
-                ItemStack itemhand = ((sourceentity instanceof LivingEntity) ? ((LivingEntity) sourceentity).getHeldItemOffhand() : ItemStack.EMPTY);
-                if(event.getSource().isProjectile() && sourceentity != null)
-                    sourceentity.getPersistentData().putDouble("bowshot",1);
-                if(itemhand.getItem().equals(ModItems.STAR_EDGE))
-                {
-                    if (itemhand.getOrCreateTag().getDouble("armara") == 1) {
-                        if (Math.random() < 0.1 && sourceentity.getPersistentData().getDouble("crit") == 0)
-                            event.setAmount(event.getAmount() * 10);
+                if(sourceentity != null) {
+                    ItemStack itemhand = ((sourceentity instanceof LivingEntity) ? ((LivingEntity) sourceentity).getHeldItemOffhand() : ItemStack.EMPTY);
+                    if (event.getSource().isProjectile() && sourceentity != null)
+                        sourceentity.getPersistentData().putDouble("Bowshot", 1);
+                    if (event.getSource() == DamageSource.causeTridentDamage(sourceentity, entity))
+                        sourceentity.getPersistentData().putDouble("trident", 10);
+
+                    if (itemhand.getItem().equals(ModItems.STAR_EDGE)) {
+                        }
+                        if (itemhand.getOrCreateTag().getDouble("Aevitas") == 1 && entity instanceof PlayerEntity) {
+                            PlayerEntity player = (PlayerEntity) event.getEntity();
+                            player.removePotionEffect(Effects.ABSORPTION);
+                            player.removePotionEffect(Effects.REGENERATION);
+                            ItemStack items = sourceentity.getEquipmentAndArmor().iterator().next();
+                            items.setDamage((int) (items.getDamage()-10));
+                        }
+                        if (itemhand.getOrCreateTag().getDouble("Evorsio") == 1) {
+                            ItemStack items = entity.getEquipmentAndArmor().iterator().next();
+                            items.setDamage((int) (items.getDamage()+40));
+                        }
+                    if (itemhand.getOrCreateTag().getDouble("Vicio") == 1 && sourceentity.getPersistentData().getDouble("trident") == 1) {
+                        sourceentity.getPersistentData().putDouble("trident", sourceentity.getPersistentData().getDouble("tridemt")-1);
+                        if(sourceentity.getPersistentData().getDouble("VicioStack") < 10)
+                        sourceentity.getPersistentData().putDouble("VicioStack",sourceentity.getPersistentData().getDouble("VicioStack")+1);
                     }
-                    if (itemhand.getOrCreateTag().getDouble("gelu") == 1) {
+
+                        if (itemhand.getOrCreateTag().getDouble("Armara") == 1) {
+                            if (Math.random() < 0.1 && sourceentity.getPersistentData().getDouble("crit") == 0)
+                                event.setAmount(event.getAmount() * 10);
+                        }
+                        if (itemhand.getOrCreateTag().getDouble("Gelu") == 1) {
                         if (Math.random() < 0.5 && sourceentity.getPersistentData().getDouble("crit") == 1)
-                            event.setAmount(event.getAmount() * (float)2.5);
-                    }
-                    if (itemhand.getOrCreateTag().getDouble("aevitas") == 1)
-                    {
-                        event.setAmount(event.getAmount()*(float)(1+0.06*sourceentity.getPersistentData().getDouble("aevitasstack")));
-                    }
-                    if(sourceentity.getPersistentData().getDouble("bowshot") > 0 && itemhand.getOrCreateTag().getDouble("evorsio") == 1)
-                    {
-                        event.setAmount(event.getAmount()*(float)2.5);
-                        sourceentity.getPersistentData().putDouble("bowshot",0);
+                            event.setAmount(event.getAmount() * (float) 2.5);
+                        if (sourceentity.getPersistentData().getDouble("Bowshot") > 0 && itemhand.getOrCreateTag().getDouble("Alcara") == 1) {
+                            event.setAmount(event.getAmount() * (float) 7);
+                            sourceentity.getPersistentData().putDouble("Bowshot", 0);
+                        }
                     }
                 }
             }
@@ -70,13 +90,15 @@ public class EventHandler {
                 Entity entity = event.getEntity();
                 Entity sourceentity = event.getSource().getTrueSource();
                 Entity livingEntity = event.getEntityLiving();
-                ItemStack itemhand = ((entity instanceof LivingEntity) ? ((LivingEntity) entity).getHeldItemOffhand() : ItemStack.EMPTY);
-                if(itemhand.getItem().equals(ModItems.STAR_EDGE) && itemhand.getOrCreateTag().getDouble("decidia") == 1) {
-                    event.setCanceled(false);
-                    event.getSource().setDamageBypassesArmor().setDamageIsAbsolute();
-                    event.setAmount(event.getAmount() + 6 + EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS, itemhand.getStack()));
+                if(sourceentity!= null) {
+                    ItemStack itemhand = ((entity instanceof LivingEntity) ? ((LivingEntity) entity).getHeldItemOffhand() : ItemStack.EMPTY);
+                    if (itemhand.getItem().equals(ModItems.STAR_EDGE) && itemhand.getOrCreateTag().getDouble("Decidia") == 1) {
+                        event.setCanceled(false);
+                        event.getSource().setDamageBypassesArmor().setDamageIsAbsolute();
+                        event.setAmount(event.getAmount() + 6 + EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS, itemhand.getStack()));
+                    }
+                    sourceentity.getPersistentData().putDouble("nocrit", 0);
                 }
-                sourceentity.getPersistentData().putDouble("nocrit" , 0);
             }
         }
     }
